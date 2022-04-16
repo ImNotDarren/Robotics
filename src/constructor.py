@@ -17,13 +17,18 @@ class State(object):
         # (3 items + 1 empty) x (5 people + 1 empty) = 24 possibilities
         self._item_list = item_list
         # ['00000', '00100', '00110'] assume there will only be 3 items
-        # there will only be 5 attributes for now
+        # there will only be 10 attributes for now
         # attributes:
-        # blue / yellow
+        # blue
+        # yellow
         # bottle
         # can
-        # empty / full
-        # soft / hard
+        # empty
+        # full
+        # soft
+        # hard
+        # metal
+        # plastic
         # 2^5 X 3 = 32 X 3 = 96
         # TODO: implementing time later
         # self._current_time = current_time  # morning 7-11, noon 11-13, afternoon 13-17, night 17-22, midnight 22-7
@@ -63,7 +68,7 @@ class Action(object):
         # 'd' deliver
         self._sentence = None
 
-        if type == 'd':
+        if self._a_type == 'd':
             self._prop_values = None
             self._name = name
             self._sentence = self.generate_sentence()
@@ -71,10 +76,10 @@ class Action(object):
         else:
             self._prop_values = prop_values
             self._name = name
-            if a_type == 'p' or 'wh':
+            if self._a_type == 'p' or 'wh':
                 self._sentence = self.generate_sentence()
 
-        # prop_values are ['soft'] when _a_type is 'e'
+        # prop_values are ['look'] when _a_type is 'e'
         # prop_values is ['item'] or ['person'] when _a_type is 'wh'
         # prop_values is ['item', 'sandwich'] or ['person', 'Alice'] or ['room', 'Office 1'] when _a_type is 'wh'
 
@@ -86,7 +91,7 @@ class Action(object):
             elif self._prop_values[0] == 'person':
                 qs = 'Who should I deliver this item to?'
             else:
-                print('Invalid property value!')
+                print('Invalid person value! ' + str(self._prop_values[0]))
                 exit(1)
         elif self._a_type == 'p':
             if self._prop_values[0] == 'item':
@@ -100,8 +105,11 @@ class Action(object):
                 exit(1)
         elif self._a_type == 'd':
             qs = 'Is this what you want?'
+
+        elif self._a_type == 'e':
+            qs = 'Exploring...'
         else:
-            print('Invalid action type!')
+            print('Invalid action type ' + str(self._a_type) + ' !')
             exit(1)
 
         return qs
@@ -119,23 +127,31 @@ class Obs(object):
 
 
 class PomdpInit:
-    def __init__(self, known_attr):
-        self._known_items = known_attr[0]  # String array
-        self._known_people = known_attr[1]  # String array
-        self._known_rooms = known_attr[2]  # String array
-        self._known_props = known_attr[3]  # String array
+    def __init__(self):
+        self._known_items = ['1', '2', '3']
+        self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
+        # self._known_props = ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
+        self._known_props = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
         self._state = []
+        self._state_item_set = []
+        self._num_of_attr = len(self._known_props)
         self._action = []
         self._obs = []
         self._classifiers = []  # TODO: what is this
-        self._trans = np.zeros((len(self._action), len(self._state), len(self._state)))
-        self._obs_function = np.zeros((len(self._action), len(self._state), len(self._obs)))
-        self._reward_fun = np.zeros((len(self._action), len(self._state)))
+
         self.generate_state_set()
         self.generate_action_set()
-        self.generate_observation_set()
-        self.generate_obs_fun()
-        self.generate_reward_fun()
+
+
+        # self._trans = np.zeros((len(self._action), len(self._state), len(self._state)))
+        # self._obs_function = np.zeros((len(self._action), len(self._state), len(self._obs)))
+        # self._reward_fun = np.zeros((len(self._action), len(self._state)))
+
+        # self.generate_observation_set()
+        # self.generate_obs_fun()
+        # self.generate_reward_fun()
+
+
 
     def generate_state_set(self):
         # initialized state
@@ -148,7 +164,8 @@ class PomdpInit:
         for item in items:
             for person in people:
                 tmp_tuple = {'item': item, 'person': person}
-                for item_set in self.generate_item_set():
+                self.generate_item_set()
+                for item_set in self._state_item_set:
                     self._state.append(State(False, index, tmp_tuple, item_set))
                     index += 1
                     if item != '' and person != '':
@@ -164,9 +181,17 @@ class PomdpInit:
         # s_index = len(self._state)
 
     def generate_item_set(self):
-        res = []
         # TODO: finish this
-        return res
+        self.generate_item_set_helper(0, [], self._num_of_attr)
+
+
+    def generate_item_set_helper(self, curr_depth, path, depth):
+        if len(path) == depth:
+            self._state_item_set.append(path)
+            return
+
+        self.generate_item_set_helper(curr_depth + 1, path + ['0'], depth)
+        self.generate_item_set_helper(curr_depth + 1, path + ['1'], depth)
 
     # translate time from hour to time period
     def time_translator(self, curr_hour):
@@ -186,8 +211,18 @@ class PomdpInit:
         # ask wh-questions
         self._action.append(Action(False, 0, None, 'wh', ['item']))
         self._action.append(Action(False, 1, None, 'wh', ['person']))
-        self._action.append(Action(False, 2, None, 'wh', ['room']))
-        action_index_count = 3
+        self._action.append(Action(False, 2, None, 'e', ['look']))
+        self._action.append(Action(False, 3, None, 'e', ['grasp']))
+        self._action.append(Action(False, 4, None, 'e', ['lift_slow']))
+        self._action.append(Action(False, 5, None, 'e', ['hold']))
+        self._action.append(Action(False, 6, None, 'e', ['shake']))
+        self._action.append(Action(False, 7, None, 'e', ['low_drop']))
+        self._action.append(Action(False, 8, None, 'e', ['tap']))
+        self._action.append(Action(False, 9, None, 'e', ['push']))
+        self._action.append(Action(False, 10, None, 'e', ['poke']))
+        self._action.append(Action(False, 11, None, 'e', ['crush']))
+        self._action.append(Action(False, 12, None, 'e', ['reinit']))
+        action_index_count = 13
         # ask polar questions
         # self._actions.append(Action(False, 4, 'p', ['item', 'cup_metal']))
         for item in self._known_items:
@@ -195,10 +230,6 @@ class PomdpInit:
             action_index_count += 1
         for person in self._known_people:
             self._action.append(Action(False, action_index_count, None, 'p', ['person', person]))
-            action_index_count += 1
-
-        for room in self._known_rooms:
-            self._action.append(Action(False, action_index_count, None, 'p', ['room', room]))
             action_index_count += 1
 
         # explore actions
