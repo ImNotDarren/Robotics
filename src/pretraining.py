@@ -14,9 +14,10 @@ if __name__ == '__main__':
     people = table.known_professors + table.known_students
     rooms = table.known_rooms
     props = table.known_props
+    ka = [items, people, rooms, props]
     print(people)
     # model = PomdpInit([items, people, rooms, props])
     # agent = DQNAgent(len(model._state), len(model._action))
-
+    pomdp = PomdpInit()
     pretraining_data_path = '../data/pretraining.csv'
     # a = State(False, 1, {'item': None, 'person': None, 'room': None}, [], 'morning')

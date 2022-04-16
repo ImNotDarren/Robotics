@@ -7,7 +7,7 @@ from collections import deque
 from constructor import State, Action, Item, Obs, PomdpInit
 
 
-class DQNAgent:
+class DRQNAgent:
     def __init__(self, state_size, action_size):
         self.optimizer = None
         self.cost = None
