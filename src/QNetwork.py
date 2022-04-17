@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import random
 from collections import deque
-from constructor import State, Action, Item, Obs, PomdpInit
+from constructor import State, Action, Obs, PomdpInit
 
 
 class DRQNAgent:

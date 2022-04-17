@@ -127,9 +127,10 @@ class Obs(object):
 
 
 class PomdpInit:
-    def __init__(self):
+    def __init__(self, initial_facts):
         self._known_items = ['1', '2', '3']
-        self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
+        # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
+        self._known_people = initial_facts
         # self._known_props = ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
         self._known_props = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
         self._state = []
@@ -209,33 +210,29 @@ class PomdpInit:
 
     def generate_action_set(self):
         # ask wh-questions
-        self._action.append(Action(False, 0, None, 'wh', ['item']))
-        self._action.append(Action(False, 1, None, 'wh', ['person']))
-        self._action.append(Action(False, 2, None, 'e', ['look']))
-        self._action.append(Action(False, 3, None, 'e', ['grasp']))
-        self._action.append(Action(False, 4, None, 'e', ['lift_slow']))
-        self._action.append(Action(False, 5, None, 'e', ['hold']))
-        self._action.append(Action(False, 6, None, 'e', ['shake']))
-        self._action.append(Action(False, 7, None, 'e', ['low_drop']))
-        self._action.append(Action(False, 8, None, 'e', ['tap']))
-        self._action.append(Action(False, 9, None, 'e', ['push']))
-        self._action.append(Action(False, 10, None, 'e', ['poke']))
-        self._action.append(Action(False, 11, None, 'e', ['crush']))
-        self._action.append(Action(False, 12, None, 'e', ['reinit']))
+        self._action.append(Action(False, 0, 'wh-item', 'wh', ['item']))
+        self._action.append(Action(False, 1, 'wh-person', 'wh', ['person']))
+        self._action.append(Action(False, 2, 'look', 'e', ['look']))
+        self._action.append(Action(False, 3, 'grasp', 'e', ['grasp']))
+        self._action.append(Action(False, 4, 'lift_slow', 'e', ['lift_slow']))
+        self._action.append(Action(False, 5, 'hold', 'e', ['hold']))
+        self._action.append(Action(False, 6, 'shake', 'e', ['shake']))
+        self._action.append(Action(False, 7, 'low_drop', 'e', ['low_drop']))
+        self._action.append(Action(False, 8, 'tap', 'e', ['tap']))
+        self._action.append(Action(False, 9, 'push', 'e', ['push']))
+        self._action.append(Action(False, 10, 'poke', 'e', ['poke']))
+        self._action.append(Action(False, 11, 'crush', 'e', ['crush']))
+        self._action.append(Action(False, 12, 'reinit', 'e', ['reinit']))
         action_index_count = 13
         # ask polar questions
-        # self._actions.append(Action(False, 4, 'p', ['item', 'cup_metal']))
         for item in self._known_items:
-            self._action.append(Action(False, action_index_count, None, 'p', ['item', item]))
+            self._action.append(Action(False, action_index_count, 'p-item-'+item, 'p', ['item', item]))
             action_index_count += 1
         for person in self._known_people:
-            self._action.append(Action(False, action_index_count, None, 'p', ['person', person]))
+            self._action.append(Action(False, action_index_count, 'p-person-'+person, 'p', ['person', person]))
             action_index_count += 1
 
-        # explore actions
-        for props in self._known_props:
-            self._action.append(Action(False, action_index_count, None, 'e', [props]))
-            action_index_count += 1
+        self._action.append(Action(True, action_index_count, 'deliver', 'd', ['']))
 
     def generate_observation_set(self):
         TODO = 1
