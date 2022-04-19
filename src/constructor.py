@@ -116,12 +116,18 @@ class Action(object):
 
 
 class Obs(object):
-    def __init__(self, nonavail, prop_values):
-        self._nonavail = nonavail
-        if nonavail == False:
+    def __init__(self, o_type, prop_values):
+        self._o_type = o_type
+        # na, e, qs
+
+        if o_type == 'e':
             self._prop_values = prop_values
-            self.name = 'p' + ','.join(prop_values)
-        else:
+            self.name = 'p' + ','.join(prop_values[0])
+        elif o_type == 'qs':
+            # 0: item/person, 1: prop_value, 2: T/F
+            self._prop_values = prop_values
+            self.name = prop_values[0][0] + prop_values[1] + prop_values[2]
+        elif o_type == 'na':
             self._prop_values = None
             self._name = 'na'
 
@@ -182,7 +188,6 @@ class PomdpInit:
         # s_index = len(self._state)
 
     def generate_item_set(self):
-        # TODO: finish this
         self.generate_item_set_helper(0, [], self._num_of_attr)
 
 
