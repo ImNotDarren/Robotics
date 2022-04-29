@@ -14,6 +14,10 @@ if __name__ == '__main__':
     people = table.known_professors + table.known_students
 
     pomdp = PomdpInit(people)
+
+    for obs in pomdp._obs:
+        print(obs._name)
+
     human = Human(table.training_data)
 
     for h in human.training_data:

@@ -43,8 +43,8 @@ class State(object):
 
     def tuple_to_str(self):
         res = 'i'
-        if self._tuple['item'] != None:
-            res += self._tuple['item']
+        if self._tuple['object'] != None:
+            res += self._tuple['object']
         res += 'p'
         if self._tuple['person'] != None:
             res += self._tuple['person']
@@ -94,7 +94,7 @@ class Action(object):
                 print('Invalid person value! ' + str(self._prop_values[0]))
                 exit(1)
         elif self._a_type == 'p':
-            if self._prop_values[0] == 'item':
+            if self._prop_values[0] == 'object':
                 qs = 'Should I deliver a ' + self._prop_values[1] + '?'
             elif self._prop_values[0] == 'person':
                 qs = 'Is this deliver for ' + self._prop_values[1] + '?'
@@ -122,25 +122,32 @@ class Obs(object):
 
         if o_type == 'e':
             self._prop_values = prop_values
-            self.name = 'p' + ','.join(prop_values[0])
+            self._name = 'e' + ','.join(prop_values[0])
         elif o_type == 'qs':
-            # 0: item/person, 1: prop_value, 2: T/F
+            # 0: object/person, 1: prop_value, 2: T/F
             self._prop_values = prop_values
-            self.name = prop_values[0][0] + prop_values[1] + prop_values[2]
+            self._name = prop_values[0][0] + prop_values[1] + self.TF_to_str(prop_values[2])
         elif o_type == 'na':
             self._prop_values = None
             self._name = 'na'
 
+    @staticmethod
+    def TF_to_str(p):
+        if p:
+            return 'T'
+        else:
+            return 'F'
+
 
 class PomdpInit:
     def __init__(self, initial_facts):
-        self._known_items = ['1', '2', '3']
+        self._known_objects = ['1', '2', '3']
         # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
         self._known_people = initial_facts
         # self._known_props = ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
         self._known_props = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
         self._state = []
-        self._state_item_set = []
+        self._state_object_set = []
         self._num_of_attr = len(self._known_props)
         self._action = []
         self._obs = []
@@ -149,36 +156,32 @@ class PomdpInit:
         self.generate_state_set()
         self.generate_action_set()
 
-
         # self._trans = np.zeros((len(self._action), len(self._state), len(self._state)))
         # self._obs_function = np.zeros((len(self._action), len(self._state), len(self._obs)))
         # self._reward_fun = np.zeros((len(self._action), len(self._state)))
 
-        # self.generate_observation_set()
-        # self.generate_obs_fun()
+        self.generate_obs_set()
+        self.generate_obs_fun()
         # self.generate_reward_fun()
-
-
 
     def generate_state_set(self):
         # initialized state
         index = 1
-        items = ['1', '2', '3', '']
+        objects = ['1', '2', '3', '']
         table = Table()
         people = table.known_professors + table.known_students
         people.append('')
 
-        for item in items:
+        for obj in objects:
             for person in people:
-                tmp_tuple = {'item': item, 'person': person}
-                self.generate_item_set()
-                for item_set in self._state_item_set:
-                    self._state.append(State(False, index, tmp_tuple, item_set))
+                tmp_tuple = {'object': obj, 'person': person}
+                self.generate_obj_set()
+                for object_set in self._state_object_set:
+                    self._state.append(State(False, index, tmp_tuple, object_set))
                     index += 1
-                    if item != '' and person != '':
-                        self._state.append(State(True, index, tmp_tuple, item_set))
+                    if obj != '' and person != '':
+                        self._state.append(State(True, index, tmp_tuple, object_set))
                         index += 1
-
 
         # time = datetime.now()
         # # get current hour
@@ -187,17 +190,16 @@ class PomdpInit:
 
         # s_index = len(self._state)
 
-    def generate_item_set(self):
-        self.generate_item_set_helper(0, [], self._num_of_attr)
+    def generate_obj_set(self):
+        self.generate_obj_set_helper(0, [], self._num_of_attr)
 
-
-    def generate_item_set_helper(self, curr_depth, path, depth):
+    def generate_obj_set_helper(self, curr_depth, path, depth):
         if len(path) == depth:
-            self._state_item_set.append(path)
+            self._state_object_set.append(path)
             return
 
-        self.generate_item_set_helper(curr_depth + 1, path + ['0'], depth)
-        self.generate_item_set_helper(curr_depth + 1, path + ['1'], depth)
+        self.generate_obj_set_helper(curr_depth + 1, path + ['0'], depth)
+        self.generate_obj_set_helper(curr_depth + 1, path + ['1'], depth)
 
     # translate time from hour to time period
     def time_translator(self, curr_hour):
@@ -230,17 +232,38 @@ class PomdpInit:
         self._action.append(Action(False, 12, 'reinit', 'e', ['reinit']))
         action_index_count = 13
         # ask polar questions
-        for item in self._known_items:
-            self._action.append(Action(False, action_index_count, 'p-item-'+item, 'p', ['item', item]))
+        for obj in self._known_objects:
+            self._action.append(Action(False, action_index_count, 'p-obj-' + obj, 'p', ['object', obj]))
             action_index_count += 1
         for person in self._known_people:
-            self._action.append(Action(False, action_index_count, 'p-person-'+person, 'p', ['person', person]))
+            self._action.append(Action(False, action_index_count, 'p-person-' + person, 'p', ['person', person]))
             action_index_count += 1
 
         self._action.append(Action(True, action_index_count, 'deliver', 'd', ['']))
 
-    def generate_observation_set(self):
-        TODO = 1
+    def generate_obs_set(self):
+        # e
+        self.generate_obs_set_helper(0, [], len(self._known_props))
+
+        # qs
+        for person in self._known_people:
+            self._obs.append(Obs('qs', ['person', person, True]))
+            self._obs.append(Obs('qs', ['person', person, False]))
+
+        for prop in self._known_props:
+            self._obs.append(Obs('qs', ['object', prop, True]))
+            self._obs.append(Obs('qs', ['object', prop, False]))
+
+        # na
+        self._obs.append(Obs('na', None))
+
+    def generate_obs_set_helper(self, curr_depth, path, depth):
+        if len(path) == depth:
+            self._obs.append(Obs('e', [path]))
+            return
+
+        self.generate_obs_set_helper(curr_depth + 1, path + ['0'], depth)
+        self.generate_obs_set_helper(curr_depth + 1, path + ['1'], depth)
 
     def generate_obs_fun(self):
         TODO = 1
