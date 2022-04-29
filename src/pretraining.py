@@ -1,11 +1,8 @@
 #! /usr/bin/env python
 
-import numpy as np
-import tensorflow as tf
-import csv
-from constructor import State, Action, Obs, PomdpInit
+from constructor import PomdpInit
 from oracle import Table
-from human import Human, Person
+from human import Human
 
 if __name__ == '__main__':
     # initialize known attributes
@@ -15,10 +12,10 @@ if __name__ == '__main__':
 
     pomdp = PomdpInit(people)
 
-    for obs in pomdp._obs:
-        print(obs._name)
+    # for obs in pomdp._obs:
+    #     print(obs._name)
 
     human = Human(table.training_data)
 
-    for h in human.training_data:
-        print(h.name + ',' + h.object)
+    # for h in human.training_data:
+    #     print(h.name + ',' + h.object)

@@ -1,8 +1,7 @@
 from src.agent import BaseAgent
 from src.replay_memory import DRQNReplayMemory
-from src.networks.drqn import DRQN
+from src.drqn import DRQN
 import numpy as np
-from tqdm import tqdm
 
 
 class DRQNAgent(BaseAgent):
