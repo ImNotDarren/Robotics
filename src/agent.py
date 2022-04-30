@@ -1,34 +1,21 @@
-from src.env_wrapper import EnvWrapper
-import numpy as np
+from drqn import Q_Network
+from constructor import State, Action, Obs, PomdpInit
 
+class Agent:
+    def __init__(self, pomdp):
+        # init state
+        self.current_state = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
 
-class BaseAgent:
+    def get_person(self):
+        print("Who am I talking to?")
 
-    def __init__(self, config):
-        self.config = config
-        self.action = config.action
-        self.rewards = 0
-        self.lens = 0
-        self.epsilon = 0.9
-        self.min_reward = -1.
-        self.max_reward = 1.0
-        self.replay_memory = None
-        self.history = None
-        self.net = None
-        if self.config.restore:
-            self.load()
-        else:
-            self.i = 0
+    @staticmethod
+    def get_obj_list(pomdp):
+        obj = ''
+        for i in range(len(pomdp._known_props)):
+            obj += '0'
+        return [obj, obj, obj]
 
-
-
-    def save(self):
-        self.replay_memory.save()
-        self.net.save_session()
-        np.save(self.config.dir_save+'step.npy', self.i)
-
-    def load(self):
-        self.replay_memory.load()
-        self.net.restore_session()
-        self.i = np.load(self.config.dir_save+'step.npy')
-
+    def policy(self, state):
+        # TODO
+        return

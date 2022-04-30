@@ -5,6 +5,7 @@ class Person(object):
         self.object = data[0]
         self.name = data[1]
 
+
 class Human:
     def __init__(self, training_data):
         # training_data is [[object1, person1], [object2, person2], ...]
@@ -15,5 +16,3 @@ class Human:
         for data in training_data:
             temp_person = Person(data)
             self.training_data.append(temp_person)
-
-

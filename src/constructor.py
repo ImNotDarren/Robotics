@@ -9,13 +9,12 @@ from oracle import Table
 
 
 class State(object):
-    def __init__(self, term, s_index, tuple_, item_list):
+    def __init__(self, term, s_index, tuple_, obj_list):
         self._term = term  # terminal state
         self._s_index = s_index
         self._tuple = tuple_
-        # tuple is a dictionary, it's {item: "", person: ""}
-        # (3 items + 1 empty) x (5 people + 1 empty) = 24 possibilities
-        self._item_list = item_list
+        # tuple is a dictionary, it's {object: "", person: ""}
+        self._obj_list = obj_list
         # ['00000', '00100', '00110'] assume there will only be 3 items
         # there will only be 10 attributes for now
         # attributes:
@@ -37,17 +36,21 @@ class State(object):
 
     def item_to_str(self):
         res = ''
-        for item in self._item_list:
-            res = res + item + ','
+        for obj in self._obj_list:
+            res = res + obj + ','
         return res[:-1]  # remove the last ','
 
     def tuple_to_str(self):
-        res = 'i'
+        res = 'o'
         if self._tuple['object'] != None:
             res += self._tuple['object']
+        else:
+            res += 'None'
         res += 'p'
         if self._tuple['person'] != None:
             res += self._tuple['person']
+        else:
+            res += 'None'
         return res
 
     def get_name(self):
@@ -165,23 +168,35 @@ class PomdpInit:
         # self.generate_reward_fun()
 
     def generate_state_set(self):
-        # initialized state
-        index = 1
-        objects = ['1', '2', '3', '']
-        table = Table()
-        people = table.known_professors + table.known_students
-        people.append('')
+        # only initialize initial state
+        self._state.append(State(False, 0, {'object': '', 'person': ''}, self.get_obj_list()))
 
-        for obj in objects:
-            for person in people:
-                tmp_tuple = {'object': obj, 'person': person}
-                self.generate_obj_set()
-                for object_set in self._state_object_set:
-                    self._state.append(State(False, index, tmp_tuple, object_set))
-                    index += 1
-                    if obj != '' and person != '':
-                        self._state.append(State(True, index, tmp_tuple, object_set))
-                        index += 1
+    def get_obj_list(self):
+        obj = ''
+        for i in range(len(self._known_props)):
+            obj += '0'
+        return [obj, obj, obj]
+
+    # def generate_state_set(self):
+    #     # initialized state
+    #     index = 1
+    #     objects = ['1', '2', '3', '']
+    #     table = Table()
+    #     people = table.known_professors + table.known_students
+    #     people.append('')
+    #
+    #     for obj in objects:
+    #         for person in people:
+    #             tmp_tuple = {'object': obj, 'person': person}
+    #             self.generate_obj_set()
+    #             for obj1 in self._state_object_set:
+    #                 for obj2 in self._state_object_set:
+    #                     for obj3 in self._state_object_set:
+    #                         self._state.append(State(False, index, tmp_tuple, [obj1, obj2, obj3]))
+    #                         index += 1
+    #                         if obj != '' and person != '':
+    #                             self._state.append(State(True, index, tmp_tuple, [obj1, obj2, obj3]))
+    #                             index += 1
 
         # time = datetime.now()
         # # get current hour
@@ -190,16 +205,24 @@ class PomdpInit:
 
         # s_index = len(self._state)
 
-    def generate_obj_set(self):
-        self.generate_obj_set_helper(0, [], self._num_of_attr)
+    # initialize state without knowing the index
+    def get_state(self, term, tuple_, obj_list):
+        for s in self._state:
+            if s._term == term and s._tuple == tuple_ and s._obj_list == obj_list:
+                return s
+        print("No such state!")
+        exit(1)
 
-    def generate_obj_set_helper(self, curr_depth, path, depth):
-        if len(path) == depth:
-            self._state_object_set.append(path)
-            return
-
-        self.generate_obj_set_helper(curr_depth + 1, path + ['0'], depth)
-        self.generate_obj_set_helper(curr_depth + 1, path + ['1'], depth)
+    # def generate_obj_set(self):
+    #     self.generate_obj_set_helper(0, '', self._num_of_attr)
+    #
+    # def generate_obj_set_helper(self, curr_depth, path, depth):
+    #     if len(path) == depth:
+    #         self._state_object_set.append(path)
+    #         return
+    #
+    #     self.generate_obj_set_helper(curr_depth + 1, path + '0', depth)
+    #     self.generate_obj_set_helper(curr_depth + 1, path + '1', depth)
 
     # translate time from hour to time period
     def time_translator(self, curr_hour):
