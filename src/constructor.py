@@ -266,7 +266,7 @@ class PomdpInit:
 
     def generate_obs_set(self):
         # e
-        self.generate_obs_set_helper(0, [], len(self._known_props))
+        self.generate_obs_set_helper(0, '', len(self._known_props))
 
         # qs
         for person in self._known_people:
@@ -285,8 +285,8 @@ class PomdpInit:
             self._obs.append(Obs('e', [path]))
             return
 
-        self.generate_obs_set_helper(curr_depth + 1, path + ['0'], depth)
-        self.generate_obs_set_helper(curr_depth + 1, path + ['1'], depth)
+        self.generate_obs_set_helper(curr_depth + 1, path + '0', depth)
+        self.generate_obs_set_helper(curr_depth + 1, path + '1', depth)
 
     def generate_obs_fun(self):
         TODO = 1
@@ -307,6 +307,3 @@ class PomdpInit:
                         self._reward_fun[action._a_index, state._s_index] = -8.0  # TODO: this is only a rough number
                     # TODO: need to add final reward
 
-    @property
-    def state(self):
-        return self._state
