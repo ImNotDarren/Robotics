@@ -13,12 +13,13 @@ from tensorboardX import SummaryWriter
 
 from drqn import Q_Network, EpisodeMemory, EpisodeBuffer
 from constructor import State, Action, Obs, PomdpInit
-from object import Object
+
 
 class Agent:
     def __init__(self, pomdp, person):
         # init state
-        self.current_obs = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
+        self.current_state = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
+        self.current_obs = None
         self.next_obs = None
         self.actionOut = None
         self.rewardOut = None
