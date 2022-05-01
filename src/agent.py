@@ -13,9 +13,10 @@ from tensorboardX import SummaryWriter
 
 from drqn import Q_Network, EpisodeMemory, EpisodeBuffer
 from constructor import State, Action, Obs, PomdpInit
+from object import Object
 
 class Agent:
-    def __init__(self, pomdp):
+    def __init__(self, pomdp, person):
         # init state
         self.current_obs = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
         self.next_obs = None
@@ -45,6 +46,10 @@ class Agent:
 
         self.q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
         self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
+
+        # setup training data
+        self.person_name = person.name
+        self.prop_ground_truth = Object(person.object).prop
 
     @staticmethod
     def get_obj_list(pomdp):
