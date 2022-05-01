@@ -1,4 +1,3 @@
-import csv
 import pandas as pd
 
 
@@ -6,9 +5,9 @@ class Object:
     def __init__(self, name):
         self.obj_path = '../data/object_list.csv'
         self.name = name
-        self.prop = []
-        self.get_prop()
+        self.prop = self.get_prop()
 
+    # get object's properties by its name
     def get_prop(self):
         prop_string = None
         with open(self.obj_path) as csv_file:
@@ -21,8 +20,8 @@ class Object:
                         prop_string = data_words[i]
 
             if prop_string is None:
-                print('No such object!')
+                print('No object ' + self.name + '!')
                 exit(1)
             else:
-                # turn prop_string into list
-                self.prop = prop_string.split(', ')
+                # turn prop_string into list and return
+                return prop_string.split(', ')

@@ -48,8 +48,7 @@ class Agent:
         self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
 
         # setup training data
-        self.person_name = person.name
-        self.prop_ground_truth = Object(person.object).prop
+        self.person = person  # person.name / person.object / person.prop_ground_truth
 
     @staticmethod
     def get_obj_list(pomdp):

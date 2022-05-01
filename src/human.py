@@ -1,9 +1,13 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
+from object import Object
+
 
 class Person(object):
     def __init__(self, data):
         self.object = data[0]
         self.name = data[1]
+        self.obj_path = '../data/object_list.csv'
+        self.prop_ground_truth = Object(self.object).prop
 
 
 class Human:
