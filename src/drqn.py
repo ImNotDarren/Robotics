@@ -51,7 +51,7 @@ class Q_Network(nn.Module):
 
     def init_hidden_state(self, batch_size, training=None):
 
-        assert training is not None, "training step parameter should be dtermined"
+        assert training is not None, "training step parameter should be determined"
 
         if training is True:
             return torch.zeros([1, batch_size, self.hidden_space]), torch.zeros([1, batch_size, self.hidden_space])
@@ -63,7 +63,8 @@ class Q_Network(nn.Module):
         tmp[state] = 1
         return tmp
 
-class EpisodeMemory():
+
+class EpisodeMemory:
     """Episode memory for recurrent agent.py"""
 
     def __init__(self, random_update=False,
@@ -78,7 +79,8 @@ class EpisodeMemory():
 
         if (random_update is False) and (self.batch_size > 1):
             sys.exit(
-                'It is recommend to use 1 batch for sequential update, if you want, erase this code block and modify code')
+                'It is recommend to use 1 batch for sequential update, if you want, erase this code block and modify '
+                'code')
 
         self.memory = collections.deque(maxlen=self.max_epi_num)
 
@@ -101,13 +103,13 @@ class EpisodeMemory():
 
             for episode in sampled_episodes:
                 if min_step > self.lookup_step:  # sample buffer with lookup_step size
-                    idx = np.random.randint(0, len(episode)-self.lookup_step+1)
+                    idx = np.random.randint(0, len(episode) - self.lookup_step + 1)
                     sample = episode.sample(
                         random_update=self.random_update, lookup_step=self.lookup_step, idx=idx)
                     sampled_buffer.append(sample)
                 else:
                     # sample buffer with minstep size
-                    idx = np.random.randint(0, len(episode)-min_step+1)
+                    idx = np.random.randint(0, len(episode) - min_step + 1)
                     sample = episode.sample(
                         random_update=self.random_update, lookup_step=min_step, idx=idx)
                     sampled_buffer.append(sample)
@@ -150,11 +152,11 @@ class EpisodeBuffer:
         done = np.array(self.done)
 
         if random_update is True:
-            obs = obs[idx:idx+lookup_step]
-            action = action[idx:idx+lookup_step]
-            reward = reward[idx:idx+lookup_step]
-            next_obs = next_obs[idx:idx+lookup_step]
-            done = done[idx:idx+lookup_step]
+            obs = obs[idx:idx + lookup_step]
+            action = action[idx:idx + lookup_step]
+            reward = reward[idx:idx + lookup_step]
+            next_obs = next_obs[idx:idx + lookup_step]
+            done = done[idx:idx + lookup_step]
 
         return dict(obs=obs,
                     acts=action,

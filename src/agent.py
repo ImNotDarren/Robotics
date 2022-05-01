@@ -22,10 +22,6 @@ class Agent:
         self.actionOut = None
         self.rewardOut = None
 
-        self.q_network = Q_Network(len(pomdp._state), len(pomdp._action))
-        self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action))
-        self.device = None
-
         self.hidden_space = 16
         self.batch_size = 4
         self.gamma = 0.99
@@ -44,12 +40,24 @@ class Agent:
         self.eps_decay = 0.999
         self.tau = 1e-2
 
+        self.device = 'cpu'
+        # self.get_device()
+
+        self.q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
+        self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
+
     @staticmethod
     def get_obj_list(pomdp):
         obj = ''
         for i in range(len(pomdp._known_props)):
             obj += '0'
         return [obj, obj, obj]
+
+    def get_device(self):
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
 
     def policy(self, state):
         # TODO
@@ -58,7 +66,5 @@ class Agent:
     def train(self):
         # setup device
         if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
+            self.device = torch.device('cuda')
 

@@ -9,10 +9,10 @@ from oracle import Table
 
 
 class State(object):
-    def __init__(self, term, s_index, tuple_, obj_list):
+    def __init__(self, term, s_index, _tuple, obj_list):
         self._term = term  # terminal state
         self._s_index = s_index
-        self._tuple = tuple_
+        self._tuple = _tuple
         # tuple is a dictionary, it's {object: "", person: ""}
         self._obj_list = obj_list
         # ['00000', '00100', '00110'] assume there will only be 3 items
@@ -42,12 +42,12 @@ class State(object):
 
     def tuple_to_str(self):
         res = 'o'
-        if self._tuple['object'] != None:
+        if self._tuple['object'] is not None:
             res += self._tuple['object']
         else:
             res += 'None'
         res += 'p'
-        if self._tuple['person'] != None:
+        if self._tuple['person'] is not None:
             res += self._tuple['person']
         else:
             res += 'None'
@@ -198,12 +198,12 @@ class PomdpInit:
     #                             self._state.append(State(True, index, tmp_tuple, [obj1, obj2, obj3]))
     #                             index += 1
 
-        # time = datetime.now()
-        # # get current hour
-        # curr_hour = time.strftime("%H")
-        # curr_time = self.time_translator(int(curr_hour))
+    # time = datetime.now()
+    # # get current hour
+    # curr_hour = time.strftime("%H")
+    # curr_time = self.time_translator(int(curr_hour))
 
-        # s_index = len(self._state)
+    # s_index = len(self._state)
 
     # initialize state without knowing the index
     def get_state(self, term, tuple_, obj_list):
@@ -306,4 +306,3 @@ class PomdpInit:
 
                         self._reward_fun[action._a_index, state._s_index] = -8.0  # TODO: this is only a rough number
                     # TODO: need to add final reward
-
