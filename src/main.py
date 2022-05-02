@@ -18,7 +18,9 @@ if __name__ == '__main__':
     # set up training data
     human = Human(table.training_data)
     for person in human.training_data:
-        agent = Agent(pomdp, person)
-        print(agent.person.name)
-        print(agent.person.prop_ground_truth)
+        agent = Agent(pomdp)
+        # print(agent.person.name)
+        # print(agent.person.prop_ground_truth)
+        agent.train(person)
+        exit()
 

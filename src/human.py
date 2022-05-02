@@ -8,6 +8,7 @@ class Person(object):
         self.name = data[1]
         self.obj_path = '../data/object_list.csv'
         self.prop_ground_truth = Object(self.object).prop
+        self.prop_list = Object(self.object).prop_list
 
 
 class Human:

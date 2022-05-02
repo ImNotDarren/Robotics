@@ -16,7 +16,7 @@ from constructor import State, Action, Obs, PomdpInit
 
 
 class Agent:
-    def __init__(self, pomdp, person):
+    def __init__(self, pomdp):
         # init state
         self.current_state = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
         self.current_obs = None
@@ -34,7 +34,11 @@ class Agent:
         self.min_epi_num = 4
         self.max_epi_num = 1000
 
-        self.episode_memory = EpisodeMemory(random_update=self.random_update, max_epi_num=self.max_epi_num, max_epi_len=self.max_epi_len, batch_size=self.batch_size, lookup_step=self.lookup_step)
+        self.episode_memory = EpisodeMemory(random_update=self.random_update,
+                                            max_epi_num=self.max_epi_num,
+                                            max_epi_len=self.max_epi_len,
+                                            batch_size=self.batch_size,
+                                            lookup_step=self.lookup_step)
 
         self.target_update_period = 4
         self.eps_start = 0.1
@@ -42,14 +46,11 @@ class Agent:
         self.eps_decay = 0.999
         self.tau = 1e-2
 
-        self.device = 'cpu'
+        self.device = torch.device('cpu')
         # self.get_device()
 
         self.q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
         self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
-
-        # setup training data
-        self.person = person  # person.name / person.object / person.prop_ground_truth
 
     @staticmethod
     def get_obj_list(pomdp):
@@ -60,16 +61,22 @@ class Agent:
 
     def get_device(self):
         if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
+            self.device = torch.device('cuda')
+            return True
+        return False
 
     def policy(self, state):
         # TODO
         return
 
-    def train(self):
+    def train(self, person):  # person.name / person.object / person.prop_ground_truth
         # setup device
-        if torch.cuda.is_available():
-            self.device = torch.device('cuda')
+        if self.get_device():
+            print('Using device: cuda')
+        else:
+            print('Using device: cpu')
+        print('--- Ground Truth ---')
+        print('Person name: ' + person.name)
+        print('Object name: ' + person.object)
+        print('Object properties: ' + person.prop_ground_truth)
 
