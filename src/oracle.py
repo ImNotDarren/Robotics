@@ -23,13 +23,13 @@ class Table:
 
     def get_training_data(self):
         with open(self.training_data_path) as csv_file:
-            df = pd.read_csv(csv_file, names=['object', 'person'])
+            df = pd.read_csv(csv_file, names=['object', 'person', 'object_set'])
             data_objects = df.object.tolist()[1:]
             data_people = df.person.tolist()[1:]
+            data_object_set = df.object_set.tolist()[1:]
 
-            if len(data_people) == len(data_objects):
-                for i in range(len(data_objects)):
-                    self.training_data.append([data_objects[i], data_people[i]])
+            for i in range(len(data_objects)):
+                self.training_data.append([data_objects[i], data_people[i], data_object_set[i]])
 
     def get_people(self):
         with open(self.initial_facts_path, "r") as initial_facts:

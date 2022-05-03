@@ -7,6 +7,8 @@ class Person(object):
     def __init__(self, data):
         self.object = data[0]
         self.name = data[1]
+        self.object_set = data[2].split(', ')
+        self.object_index = self.object_set.index(self.object)
         self.obj_path = '../data/object_list.csv'
         self.prop_ground_truth = Object(self.object).prop
         self.prop_list = Object(self.object).prop_list
@@ -55,20 +57,21 @@ class Person(object):
             else:
                 return 'No'
 
-        elif qs == 'Is this what you want?':
-            # TODO
-            return 'No'
+        elif qs.find('Is the ') != -1:
+            object_index = qs[7:8]
+            if object_index == str(self.object_index + 1):
+                return 'Yes'
+            else:
+                return 'No'
 
         else:
             print('Invalid question!')
             exit(1)
 
 
-
-
 class Human:
     def __init__(self, training_data):
-        # training_data is [[object1, person1], [object2, person2], ...]
+        # training_data is [[object1, person1, object_set1], [object2, person2, object_set2], ...]
         self.training_data = []
         self.get_training_data(training_data)
 

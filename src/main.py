@@ -9,8 +9,9 @@ from object import Object
 
 if __name__ == '__main__':
     # initialize pomdp module
+    table = Table()
     pomdp = PomdpInit()
-    print(pomdp._known_props)
+    # print(pomdp._known_props)
     # set up training data
     human = Human(table.training_data)
     for person in human.training_data:

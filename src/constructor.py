@@ -60,7 +60,7 @@ class Action(object):
         self._sentence = None
 
         if self._a_type == 'd':
-            self._prop_values = None
+            self._prop_values = prop_values
             self._name = name
             self._sentence = self.generate_sentence()
 
@@ -95,7 +95,15 @@ class Action(object):
                 print('Invalid property value!')
                 exit(1)
         elif self._a_type == 'd':
-            qs = 'Is this what you want?'
+            if self._prop_values == 1:
+                qs = 'Is the 1st one what you want?'
+            elif self._prop_values == 2:
+                qs = 'Is the 2nd one what you want?'
+            elif self._prop_values == 3:
+                qs = 'Is the 3rd one what you want?'
+            else:
+                print('Wrong object number: ' + self._prop_values + '!')
+                exit(1)
 
         elif self._a_type == 'e':
             qs = 'Exploring...'
@@ -259,7 +267,9 @@ class PomdpInit:
             self._action.append(Action(False, action_index_count, 'p-person-' + person, 'p', ['person', person]))
             action_index_count += 1
 
-        self._action.append(Action(True, action_index_count, 'deliver', 'd', ['']))
+        self._action.append(Action(True, action_index_count, 'deliver', 'd', 1))
+        self._action.append(Action(True, action_index_count, 'deliver', 'd', 2))
+        self._action.append(Action(True, action_index_count, 'deliver', 'd', 3))
 
     def generate_obs_set(self):
         # e
