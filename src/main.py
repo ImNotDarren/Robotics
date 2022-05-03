@@ -8,13 +8,9 @@ from agent import Agent
 from object import Object
 
 if __name__ == '__main__':
-    # initialize known attributes
-    table = Table()
-    # get known attributes
-    people = table.known_professors + table.known_students
     # initialize pomdp module
-    pomdp = PomdpInit(people)
-
+    pomdp = PomdpInit()
+    print(pomdp._known_props)
     # set up training data
     human = Human(table.training_data)
     for person in human.training_data:

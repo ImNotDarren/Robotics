@@ -6,6 +6,7 @@ import sys
 import pickle
 from datetime import datetime
 from oracle import Table
+from oracle import Table
 
 
 class State(object):
@@ -15,24 +16,11 @@ class State(object):
         self._tuple = _tuple
         # tuple is a dictionary, it's {object: "", person: ""}
         self._obj_list = obj_list
-        # ['00000', '00100', '00110'] assume there will only be 3 items
-        # there will only be 10 attributes for now
-        # attributes:
-        # blue
-        # yellow
-        # bottle
-        # can
-        # empty
-        # full
-        # soft
-        # hard
-        # metal
-        # plastic
-        # 2^5 X 3 = 32 X 3 = 96
-        # TODO: implementing time later
+        # ['00000', '00100', '00110'] assume that there will only be 3 items
+        # attributes: ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
+        # TODO: implement time in the future
         # self._current_time = current_time  # morning 7-11, noon 11-13, afternoon 13-17, night 17-22, midnight 22-7
         self._name = self.get_name()
-        # number of states: 24 X 96 = 2304
 
     def item_to_str(self):
         res = ''
@@ -89,16 +77,16 @@ class Action(object):
     def generate_sentence(self):
         if self._a_type == 'wh':
             # if it's a wh-question
-            if self._prop_values[0] == 'item':
-                qs = 'Which item should be delivered?'
+            if self._prop_values[0] == 'object':
+                qs = 'What kind of object should be delivered?'
             elif self._prop_values[0] == 'person':
-                qs = 'Who should I deliver this item to?'
+                qs = 'Who should I deliver this object to?'
             else:
-                print('Invalid person value! ' + str(self._prop_values[0]))
+                print('Invalid person value: ' + str(self._prop_values[0]) + '!')
                 exit(1)
         elif self._a_type == 'p':
             if self._prop_values[0] == 'object':
-                qs = 'Should I deliver a ' + self._prop_values[1] + '?'
+                qs = 'Should I deliver a ' + self._prop_values[1] + ' object?'
             elif self._prop_values[0] == 'person':
                 qs = 'Is this deliver for ' + self._prop_values[1] + '?'
             # elif self._prop_values[0] == 'room':
@@ -143,29 +131,38 @@ class Obs(object):
 
 
 class PomdpInit:
-    def __init__(self, initial_facts):
+    def __init__(self):
         self._known_objects = ['1', '2', '3']
         # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
-        self._known_people = initial_facts
+        self._known_people = []
+        self.get_known_people()
         # self._known_props = ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
-        self._known_props = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
+        self._known_props = []
+        self.get_known_props()
         self._state = []
         self._state_object_set = []
         self._num_of_attr = len(self._known_props)
         self._action = []
         self._obs = []
-        self._classifiers = []  # TODO: what is this
+        self._classifiers = []
 
         self.generate_state_set()
         self.generate_action_set()
 
-        # self._trans = np.zeros((len(self._action), len(self._state), len(self._state)))
         # self._obs_function = np.zeros((len(self._action), len(self._state), len(self._obs)))
         # self._reward_fun = np.zeros((len(self._action), len(self._state)))
 
-        self.generate_obs_set()
-        self.generate_obs_fun()
+        # self.generate_obs_set()
+        # self.generate_obs_fun()
         # self.generate_reward_fun()
+
+    def get_known_people(self):
+        table = Table()
+        self._known_people = table.known_professors + table.known_students
+
+    def get_known_props(self):
+        table = Table()
+        self._known_props = table.known_props
 
     def generate_state_set(self):
         # only initialize initial state
@@ -240,7 +237,7 @@ class PomdpInit:
 
     def generate_action_set(self):
         # ask wh-questions
-        self._action.append(Action(False, 0, 'wh-item', 'wh', ['item']))
+        self._action.append(Action(False, 0, 'wh-item', 'wh', ['object']))
         self._action.append(Action(False, 1, 'wh-person', 'wh', ['person']))
         self._action.append(Action(False, 2, 'look', 'e', ['look']))
         self._action.append(Action(False, 3, 'grasp', 'e', ['grasp']))

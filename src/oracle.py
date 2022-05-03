@@ -14,7 +14,7 @@ class Table:
         self.known_professors = []
         self.known_students = []
         self.known_rooms = []
-        self.known_props = []
+        self.known_props = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
         self.defaults = []
         self.training_data = []
         # self.get_items_and_props(item_props_table_path)
