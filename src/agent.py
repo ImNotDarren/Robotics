@@ -18,7 +18,7 @@ from constructor import State, Action, Obs, PomdpInit
 class Agent:
     def __init__(self, pomdp):
         # init state
-        self.current_state = pomdp.get_state(False, {'object': '', 'person': ''}, self.get_obj_list(pomdp))
+        self.current_state = pomdp.get_state(False, {'object': '000000', 'person': ''}, self.get_obj_list(pomdp))
         self.current_obs = None
         self.next_obs = None
         self.actionOut = None

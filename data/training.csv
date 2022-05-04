@@ -1,5 +1,5 @@
 object,person,item_set
-bottle_blue,Anna,"cup_yellow, bottle_blue, noodle"
+bottle_blue,Anna,"cup_yellow, egg_plastic_wrap, noodle"
 cup_yellow,Jack,"cup_yellow, bottle_blue, noodle"
 egg_plastic_wrap,Bob,"metal_food_can, weight, egg_plastic_wrap"
 medicine_bilberry_extract,Alice,"medicine_bilberry_extract, bottle_blue, noodle"

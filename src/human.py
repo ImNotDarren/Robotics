@@ -8,13 +8,19 @@ class Person(object):
         self.object = data[0]
         self.name = data[1]
         self.object_set = data[2].split(', ')
-        self.object_index = self.object_set.index(self.object)
+        self.object_index = self.get_index()
         self.obj_path = '../data/object_list.csv'
         self.prop_ground_truth = Object(self.object).prop
         self.prop_list = Object(self.object).prop_list
         self.queried_attr = []
         self._known_props = []
         self.get_known_props()
+
+    def get_index(self):
+        if self.object in self.object_set is True:
+            return self.object_set.index(self.object)
+        else:
+            return -1
 
     def get_known_props(self):
         table = Table()
@@ -41,9 +47,9 @@ class Person(object):
             # get the property name
             prop_name = qs[19:i]
             prop_index = self._known_props.index(prop_name)
-            if self.prop_ground_truth[prop_index] == '1':
+            if self.prop_ground_truth[prop_index] == '2':
                 return 'Yes'
-            elif self.prop_ground_truth[prop_index] == '0':
+            elif self.prop_ground_truth[prop_index] == '1':
                 return 'No'
             else:
                 print('There is no ' + prop_name + '!')
@@ -63,6 +69,12 @@ class Person(object):
                 return 'Yes'
             else:
                 return 'No'
+
+        elif qs == 'The object you want does not exist.':
+            if self.object_index == -1:
+                return 'True'
+            else:
+                return 'False'
 
         else:
             print('Invalid question!')

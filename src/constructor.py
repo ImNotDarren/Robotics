@@ -14,7 +14,7 @@ class State(object):
         self._term = term  # terminal state
         self._s_index = s_index
         self._tuple = _tuple
-        # tuple is a dictionary, it's {object: "", person: ""}
+        # tuple is a dictionary, it's {object: "", person: ""} 0 dk 1 neg 2 pos
         self._obj_list = obj_list
         # ['00000', '00100', '00110'] assume that there will only be 3 items
         # attributes: ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
@@ -64,6 +64,11 @@ class Action(object):
             self._name = name
             self._sentence = self.generate_sentence()
 
+        elif self._a_type == 'no':
+            self._prop_values = None
+            self._name = name
+            self._sentence = self.generate_sentence()
+
         else:
             self._prop_values = prop_values
             self._name = name
@@ -107,6 +112,10 @@ class Action(object):
 
         elif self._a_type == 'e':
             qs = 'Exploring...'
+
+        elif self._a_type == 'no':
+            qs = 'The object you want does not exist.'
+
         else:
             print('Invalid action type ' + str(self._a_type) + ' !')
             exit(1)
@@ -174,13 +183,13 @@ class PomdpInit:
 
     def generate_state_set(self):
         # only initialize initial state
-        self._state.append(State(False, 0, {'object': '', 'person': ''}, self.get_obj_list()))
+        self._state.append(State(False, 0, {'object': self.get_obj(), 'person': ''}, [self.get_obj(), self.get_obj(), self.get_obj()]))
 
-    def get_obj_list(self):
+    def get_obj(self):
         obj = ''
         for i in range(len(self._known_props)):
             obj += '0'
-        return [obj, obj, obj]
+        return obj
 
     # def generate_state_set(self):
     #     # initialized state
@@ -216,7 +225,7 @@ class PomdpInit:
             if s._term == term and s._tuple == tuple_ and s._obj_list == obj_list:
                 return s
         print("No such state!")
-        exit(1)
+        return 0
 
     # def generate_obj_set(self):
     #     self.generate_obj_set_helper(0, '', self._num_of_attr)
@@ -263,13 +272,17 @@ class PomdpInit:
         for obj in self._known_objects:
             self._action.append(Action(False, action_index_count, 'p-obj-' + obj, 'p', ['object', obj]))
             action_index_count += 1
-        for person in self._known_people:
-            self._action.append(Action(False, action_index_count, 'p-person-' + person, 'p', ['person', person]))
-            action_index_count += 1
+        # for person in self._known_people:
+        #     self._action.append(Action(False, action_index_count, 'p-person-' + person, 'p', ['person', person]))
+        #     action_index_count += 1
 
         self._action.append(Action(True, action_index_count, 'deliver', 'd', 1))
+        action_index_count += 1
         self._action.append(Action(True, action_index_count, 'deliver', 'd', 2))
+        action_index_count += 1
         self._action.append(Action(True, action_index_count, 'deliver', 'd', 3))
+        action_index_count += 1
+        self._action.append(Action(True, action_index_count, 'no_object', 'no', None))
 
     def generate_obs_set(self):
         # e
@@ -278,7 +291,6 @@ class PomdpInit:
         # qs
         for person in self._known_people:
             self._obs.append(Obs('qs', ['person', person, True]))
-            self._obs.append(Obs('qs', ['person', person, False]))
 
         for prop in self._known_props:
             self._obs.append(Obs('qs', ['object', prop, True]))
@@ -292,8 +304,8 @@ class PomdpInit:
             self._obs.append(Obs('e', [path]))
             return
 
-        self.generate_obs_set_helper(curr_depth + 1, path + '0', depth)
         self.generate_obs_set_helper(curr_depth + 1, path + '1', depth)
+        self.generate_obs_set_helper(curr_depth + 1, path + '2', depth)
 
     def generate_obs_fun(self):
         TODO = 1

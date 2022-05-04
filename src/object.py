@@ -30,14 +30,14 @@ class Object:
 
     def prop_to_str(self):  # turn property list into 000110
         res = ''
-        flag = '0'
+        flag = '1'
         prop_set = ['blue', 'yellow', 'empty', 'full', 'soft', 'hard']
         for prop in prop_set:
             for obj_prop in self.prop_list:
                 if prop == obj_prop:
-                    flag = '1'
+                    flag = '2'
                     break
             res += flag
-            flag = '0'
+            flag = '1'
 
         return res
