@@ -14,11 +14,14 @@ from tensorboardX import SummaryWriter
 from drqn import Q_Network, EpisodeMemory, EpisodeBuffer
 from constructor import State, Action, Obs, PomdpInit
 
+from train import Classifier
+from oracle import Table
+
 
 class Agent:
     def __init__(self, pomdp):
         # init state
-        self.current_state = pomdp.get_state(False, {'object': '000000', 'person': ''}, self.get_obj_list(pomdp))
+        self.current_state = pomdp.get_state(False, {'object': self.get_obj(pomdp), 'person': ''}, [self.get_obj(pomdp), self.get_obj(pomdp), self.get_obj(pomdp)])
         self.current_obs = None
         self.next_obs = None
         self.actionOut = None
@@ -52,12 +55,15 @@ class Agent:
         self.q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
         self.target_q_network = Q_Network(len(pomdp._state), len(pomdp._action), self.hidden_space).to(self.device)
 
+        # classifier data path
+        self.data_path = '../data/cy101/normalized_data_without_noobject/'
+
     @staticmethod
-    def get_obj_list(pomdp):
+    def get_obj(pomdp):
         obj = ''
-        for i in range(len(pomdp._known_props)):
+        for i in range(len(pomdp.predicates)):
             obj += '0'
-        return [obj, obj, obj]
+        return obj
 
     def get_device(self):
         if torch.cuda.is_available():
@@ -65,16 +71,31 @@ class Agent:
             return True
         return False
 
+    def print_device(self):
+        if self.get_device():
+            print('Using device: cuda')
+        else:
+            print('Using device: cpu')
+
     def policy(self, state):
         # TODO
         return
 
     def train(self, person):  # person.name / person.object / person.prop_ground_truth
         # setup device
-        if self.get_device():
-            print('Using device: cuda')
-        else:
-            print('Using device: cpu')
+        self.print_device()
+
+        # print out ground truth
+        self.print_ground_truth(person)
+
+        # classifier
+        table = Table()
+        objects = table.objects
+        predicates = table.predicates
+        classifier_all = Classifier(self.data_path, table, objects, predicates)
+
+    @staticmethod
+    def print_ground_truth(person):
         print('--- Ground Truth ---')
         print('Person name: ' + person.name)
         print('Object name: ' + person.object)

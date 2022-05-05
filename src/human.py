@@ -10,11 +10,11 @@ class Person(object):
         self.object_set = data[2].split(', ')
         self.object_index = self.get_index()
         self.obj_path = '../data/object_list.csv'
-        self.prop_ground_truth = Object(self.object).prop
-        self.prop_list = Object(self.object).prop_list
+        self.prop_ground_truth = Object(self.object).pred
+        self.prop_list = Object(self.object).pred_list
         self.queried_attr = []
-        self._known_props = []
-        self.get_known_props()
+        self.predicates = []
+        self.get_predicates()
 
     def get_index(self):
         if self.object in self.object_set is True:
@@ -22,9 +22,9 @@ class Person(object):
         else:
             return -1
 
-    def get_known_props(self):
+    def get_predicates(self):
         table = Table()
-        self._known_props = table.known_props
+        self.predicates = table.predicates
 
     # answer questions, return answers as strings
     def answer(self, qs):
@@ -41,12 +41,12 @@ class Person(object):
                 else:
                     # if the attribute is never answered
                     self.queried_attr.append(index)  # add the attribute index into the list
-                    return self._known_props[index]
+                    return self.predicates[index]
         elif qs.find('Should I deliver a') != -1:
             i = qs.find(' object?')
             # get the property name
             prop_name = qs[19:i]
-            prop_index = self._known_props.index(prop_name)
+            prop_index = self.predicates.index(prop_name)
             if self.prop_ground_truth[prop_index] == '2':
                 return 'Yes'
             elif self.prop_ground_truth[prop_index] == '1':

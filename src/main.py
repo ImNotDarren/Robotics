@@ -7,7 +7,8 @@ from drqn import Q_Network
 from agent import Agent
 from object import Object
 
-if __name__ == '__main__':
+
+def main():
     # initialize pomdp module
     table = Table()
     pomdp = PomdpInit()
@@ -20,4 +21,8 @@ if __name__ == '__main__':
         # print(agent.person.prop_ground_truth)
         agent.train(person)
         exit()
+
+
+if __name__ == '__main__':
+    main()
 

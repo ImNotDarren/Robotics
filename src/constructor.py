@@ -6,7 +6,6 @@ import sys
 import pickle
 from datetime import datetime
 from oracle import Table
-from oracle import Table
 
 
 class State(object):
@@ -17,7 +16,7 @@ class State(object):
         # tuple is a dictionary, it's {object: "", person: ""} 0 dk 1 neg 2 pos
         self._obj_list = obj_list
         # ['00000', '00100', '00110'] assume that there will only be 3 items
-        # attributes: ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
+        # predicates: ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
         # TODO: implement time in the future
         # self._current_time = current_time  # morning 7-11, noon 11-13, afternoon 13-17, night 17-22, midnight 22-7
         self._name = self.get_name()
@@ -153,12 +152,12 @@ class PomdpInit:
         # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
         self._known_people = []
         self.get_known_people()
-        # self._known_props = ['blue', 'yellow', 'bottle', 'can', 'empty', 'full', 'soft', 'hard', 'metal', 'plastic']
-        self._known_props = []
-        self.get_known_props()
+        # predicates = ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
+        self.predicates = []
+        self.get_predicates()
         self._state = []
         self._state_object_set = []
-        self._num_of_attr = len(self._known_props)
+        self._num_of_attr = len(self.predicates)
         self._action = []
         self._obs = []
         self._classifiers = []
@@ -177,9 +176,9 @@ class PomdpInit:
         table = Table()
         self._known_people = table.known_professors + table.known_students
 
-    def get_known_props(self):
+    def get_predicates(self):
         table = Table()
-        self._known_props = table.known_props
+        self.predicates = table.predicates
 
     def generate_state_set(self):
         # only initialize initial state
@@ -187,7 +186,7 @@ class PomdpInit:
 
     def get_obj(self):
         obj = ''
-        for i in range(len(self._known_props)):
+        for i in range(len(self.predicates)):
             obj += '0'
         return obj
 
@@ -225,6 +224,9 @@ class PomdpInit:
             if s._term == term and s._tuple == tuple_ and s._obj_list == obj_list:
                 return s
         print("No such state!")
+        print(term)
+        print(tuple_)
+        print(obj_list)
         return 0
 
     # def generate_obj_set(self):
@@ -239,7 +241,9 @@ class PomdpInit:
     #     self.generate_obj_set_helper(curr_depth + 1, path + '1', depth)
 
     # translate time from hour to time period
-    def time_translator(self, curr_hour):
+
+    @staticmethod
+    def time_translator(curr_hour):
         # morning 7-11, noon 11-13, afternoon 13-17, night 17-22, midnight 22-7
         if 7 <= curr_hour < 11:
             return 'morning'
@@ -286,15 +290,15 @@ class PomdpInit:
 
     def generate_obs_set(self):
         # e
-        self.generate_obs_set_helper(0, '', len(self._known_props))
+        self.generate_obs_set_helper(0, '', len(self.predicates))
 
         # qs
         for person in self._known_people:
             self._obs.append(Obs('qs', ['person', person, True]))
 
-        for prop in self._known_props:
-            self._obs.append(Obs('qs', ['object', prop, True]))
-            self._obs.append(Obs('qs', ['object', prop, False]))
+        for predicate in self.predicates:
+            self._obs.append(Obs('qs', ['object', predicate, True]))
+            self._obs.append(Obs('qs', ['object', predicate, False]))
 
         # na
         self._obs.append(Obs('na', None))
