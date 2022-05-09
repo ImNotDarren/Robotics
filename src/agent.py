@@ -71,13 +71,11 @@ class Agent:
             return True
         return False
 
-    def print_device(self):
-        if self.get_device():
-            print('Using device: cuda')
-        else:
-            print('Using device: cpu')
-
     def policy(self, state):
+        # TODO
+        return
+
+    def test(self):
         # TODO
         return
 
@@ -89,10 +87,8 @@ class Agent:
         self.print_ground_truth(person)
 
         # classifier
-        table = Table()
-        objects = table.objects
-        predicates = table.predicates
-        classifier_all = Classifier(self.data_path, table, objects, predicates)
+        classifier_all = Classifier(self.data_path)
+        # print(classifier_all.get_features(table.contexts[0], 'cup_yellow', 2))
 
     @staticmethod
     def print_ground_truth(person):
@@ -100,4 +96,10 @@ class Agent:
         print('Person name: ' + person.name)
         print('Object name: ' + person.object)
         print('Object properties: ' + person.prop_ground_truth)
+
+    def print_device(self):
+        if self.get_device():
+            print('Using device: cuda')
+        else:
+            print('Using device: cpu')
 

@@ -1,4 +1,4 @@
-# /usr/bin/env python
+# /usr/bin/env python3
 
 import numpy as np
 from math import log2
@@ -148,19 +148,20 @@ class Obs(object):
 
 class PomdpInit:
     def __init__(self):
+        self.table = Table()
         self._known_objects = ['1', '2', '3']
         # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
-        self._known_people = []
-        self.get_known_people()
+        self._known_people = self.table.known_professors + self.table.known_students
         # predicates = ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
-        self.predicates = []
-        self.get_predicates()
+        self.predicates = self.table.predicates
         self._state = []
         self._state_object_set = []
         self._num_of_attr = len(self.predicates)
         self._action = []
         self._obs = []
-        self._classifiers = []
+        self._classifier_name = '../runtime/classifiers/classifier_batch.pkl'
+        self._classifiers = None
+        self._dic = {}
 
         self.generate_state_set()
         self.generate_action_set()
@@ -172,51 +173,38 @@ class PomdpInit:
         # self.generate_obs_fun()
         # self.generate_reward_fun()
 
-    def get_known_people(self):
-        table = Table()
-        self._known_people = table.known_professors + table.known_students
+    def load_classifier(self, path):
+        # where to load the classifier
+        classifier_file_name = path
 
-    def get_predicates(self):
-        table = Table()
-        self.predicates = table.predicates
+        # load classifier
+        pkl_load_classifier_file = open(classifier_file_name, 'rb')
+        classifier = pickle.load(pkl_load_classifier_file)
+
+        self._classifiers = classifier
+        print("Classifier loading done")
+
+    def load_confusion_matrix(self, path):
+        f = open(path, 'r')
+        lines = f.readlines()[1:]
+        self._dic = {}
+        for line in lines:
+            words = line.split(',')
+            if words[1] in self._dic:
+                self._dic[words[1]][words[0]] = [int(w) + 1 for w in words[2:]]
+            else:
+                self._dic[words[1]] = {words[0]: [int(w) + 1 for w in words[2:]]}
 
     def generate_state_set(self):
         # only initialize initial state
-        self._state.append(State(False, 0, {'object': self.get_obj(), 'person': ''}, [self.get_obj(), self.get_obj(), self.get_obj()]))
+        self._state.append(
+            State(False, 0, {'object': self.get_obj(), 'person': ''}, [self.get_obj(), self.get_obj(), self.get_obj()]))
 
     def get_obj(self):
         obj = ''
         for i in range(len(self.predicates)):
             obj += '0'
         return obj
-
-    # def generate_state_set(self):
-    #     # initialized state
-    #     index = 1
-    #     objects = ['1', '2', '3', '']
-    #     table = Table()
-    #     people = table.known_professors + table.known_students
-    #     people.append('')
-    #
-    #     for obj in objects:
-    #         for person in people:
-    #             tmp_tuple = {'object': obj, 'person': person}
-    #             self.generate_obj_set()
-    #             for obj1 in self._state_object_set:
-    #                 for obj2 in self._state_object_set:
-    #                     for obj3 in self._state_object_set:
-    #                         self._state.append(State(False, index, tmp_tuple, [obj1, obj2, obj3]))
-    #                         index += 1
-    #                         if obj != '' and person != '':
-    #                             self._state.append(State(True, index, tmp_tuple, [obj1, obj2, obj3]))
-    #                             index += 1
-
-    # time = datetime.now()
-    # # get current hour
-    # curr_hour = time.strftime("%H")
-    # curr_time = self.time_translator(int(curr_hour))
-
-    # s_index = len(self._state)
 
     # initialize state without knowing the index
     def get_state(self, term, tuple_, obj_list):
@@ -229,19 +217,7 @@ class PomdpInit:
         print(obj_list)
         return 0
 
-    # def generate_obj_set(self):
-    #     self.generate_obj_set_helper(0, '', self._num_of_attr)
-    #
-    # def generate_obj_set_helper(self, curr_depth, path, depth):
-    #     if len(path) == depth:
-    #         self._state_object_set.append(path)
-    #         return
-    #
-    #     self.generate_obj_set_helper(curr_depth + 1, path + '0', depth)
-    #     self.generate_obj_set_helper(curr_depth + 1, path + '1', depth)
-
     # translate time from hour to time period
-
     @staticmethod
     def time_translator(curr_hour):
         # morning 7-11, noon 11-13, afternoon 13-17, night 17-22, midnight 22-7
@@ -314,18 +290,64 @@ class PomdpInit:
     def generate_obs_fun(self):
         TODO = 1
 
-    def generate_reward_fun(self):
+    def reward_fun(self, curr_state, person):
+        for a_idx, a_val in enumerate(self._action):
+            if curr_state._term is True:
+                return 0
+            elif a_val._term is False and a_val._name == 'look':
+                return -0.5
+            elif a_val._term is False and a_val._name == 'grasp':
+                return -22.0
+            elif a_val._term is False and a_val._name == 'lift_slow':
+                return -11.0
+            elif a_val._term is False and a_val._name == 'hold':
+                return -11.0
+            # making up for shake
+            elif a_val._term is False and a_val._name == 'shake':
+                return -11.0
+            # making up a cost for this lower action -- actual cost needs to be acquired from Jivko
+            elif a_val._term is False and a_val._name == 'low_drop':
+                return -20.4
+            elif a_val._term is False and a_val._name == 'push':
+                return -22.0
+            # making up for tap
+            elif a_val._term is False and a_val._name == 'tap':
+                return -22.0
+            # making up for poke
+            elif a_val._term is False and a_val._name == 'poke':
+                return -22.0
+            # making up for crush
+            elif a_val._term is False and a_val._name == 'crush':
+                return -22.0
+            elif a_val._term is False and a_val._name == 'reinit':
+                return -10.0
+            elif a_val._term is False and (a_val._a_type == 'p' or a_val._a_type == 'wh'):
+                return -5.0
+            elif a_val._term is True:
+                res = 0
+                # get the answer
+                ans = person.answer(a_val._sentence)
+                # if the answer is yes
+                if ans == 'Yes':
+                    res += 300.0
+                elif ans == 'No':
+                    res += -300.0
 
-        for action in self._action:
-            for state in self._state:
-                if state._term:
-                    self._reward_fun[action._a_index, state._s_index] = 0.0
+                # set reward for each element in state space
+                for i, s in enumerate(curr_state._tuple['object']):
+                    if s == '0':
+                        res += 0.0
+                    else:
+                        if s == person.prop_ground_truth[i]:
+                            # if the property is correct
+                            res += 20.0
+                        else:
+                            # if the property is incorrect
+                            res -= 20.0
+
+                if curr_state._tuple['person'] == person.name:
+                    res += 100.0
                 else:
-                    if action._a_type == 'e':
-                        ITRS_reward = 0  # TODO: need to get ITRS_reward
-                        self._reward_fun[action._a_index, state._s_index] = ITRS_reward
+                    res -= 100.0
 
-                    elif action._a_type == 'wh' or action._a_type == 'p':
-
-                        self._reward_fun[action._a_index, state._s_index] = -8.0  # TODO: this is only a rough number
-                    # TODO: need to add final reward
+                # TODO: need to add reward for object properties in object list

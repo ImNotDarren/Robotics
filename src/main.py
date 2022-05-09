@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from constructor import PomdpInit
 from oracle import Table
@@ -10,17 +10,17 @@ from object import Object
 
 def main():
     # initialize pomdp module
-    table = Table()
     pomdp = PomdpInit()
-    # print(pomdp._known_props)
     # set up training data
+    table = Table()
     human = Human(table.training_data)
     for person in human.training_data:
         agent = Agent(pomdp)
-        # print(agent.person.name)
-        # print(agent.person.prop_ground_truth)
         agent.train(person)
         exit()
+
+    # after training, start testing
+    agent.test()
 
 
 if __name__ == '__main__':

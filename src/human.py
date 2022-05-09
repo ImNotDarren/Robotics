@@ -72,9 +72,9 @@ class Person(object):
 
         elif qs == 'The object you want does not exist.':
             if self.object_index == -1:
-                return 'True'
+                return 'Yes'
             else:
-                return 'False'
+                return 'No'
 
         else:
             print('Invalid question!')

@@ -1,12 +1,12 @@
-object,person,item_set
+object,person,object_set
 bottle_blue,Anna,"cup_yellow, bottle_blue, noodle"
 cup_yellow,Jack,"cup_yellow, bottle_blue, noodle"
 egg_plastic_wrap,Bob,"metal_food_can, weight, egg_plastic_wrap"
 medicine_bilberry_extract,Alice,"medicine_bilberry_extract, bottle_blue, noodle"
 metal_food_can,Anna,"metal_food_can, cup_yellow, noodle"
 noodle,Hoy,"weight, noodle, bottle_blue"
-pvc,Hoy,"pvc, bottle_blue, noodle"
-weight,Alice,"egg_plastic_wrap, bottle_blue, pvc"
+pvc_3,Hoy,"pvc_3, bottle_blue, noodle"
+weight,Alice,"egg_plastic_wrap, bottle_blue, pvc_3"
 cup_yellow,Anna,"cup_yellow, bottle_blue, noodle"
 weight,Bob,"noodle, weight, cup_yellow"
 bottle_blue,Jack,"cup_yellow, bottle_blue, noodle"
