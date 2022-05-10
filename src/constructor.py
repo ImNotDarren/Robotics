@@ -13,7 +13,9 @@ class State(object):
         self._term = term  # terminal state
         self._s_index = s_index
         self._tuple = _tuple
-        # tuple is a dictionary, it's {object: "", person: ""} 0 dk 1 neg 2 pos
+        # tuple is a dictionary, it's {object: ''', title: '', gender: ''} 0 dk 1 neg 2 pos
+        # title: s->student p->professor u->unknown
+        # gender: m->male f->female u->unknown
         self._obj_list = obj_list
         # ['00000', '00100', '00110'] assume that there will only be 3 items
         # predicates: ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
@@ -33,9 +35,14 @@ class State(object):
             res += self._tuple['object']
         else:
             res += 'None'
-        res += 'p'
-        if self._tuple['person'] is not None:
-            res += self._tuple['person']
+        res += 't'
+        if self._tuple['title'] is not None:
+            res += self._tuple['title']
+        else:
+            res += 'None'
+        res += 'g'
+        if self._tuple['gender'] is not None:
+            res += self._tuple['gender']
         else:
             res += 'None'
         return res
@@ -151,7 +158,7 @@ class PomdpInit:
         self.table = Table()
         self._known_objects = ['1', '2', '3']
         # self._known_people = ['Alice', 'Jack', 'Anna', 'Bob', 'Hoy']
-        self._known_people = self.table.known_professors + self.table.known_students
+        self._known_people = self.table.professors + self.table.students
         # predicates = ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
         self.predicates = self.table.predicates
         self._state = []
@@ -198,7 +205,7 @@ class PomdpInit:
     def generate_state_set(self):
         # only initialize initial state
         self._state.append(
-            State(False, 0, {'object': self.get_obj(), 'person': ''}, [self.get_obj(), self.get_obj(), self.get_obj()]))
+            State(False, 0, {'object': self.get_obj(), 'title': 'u', 'gender': 'u'}, [self.get_obj(), self.get_obj(), self.get_obj()]))
 
     def get_obj(self):
         obj = ''

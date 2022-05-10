@@ -21,7 +21,7 @@ from oracle import Table
 class Agent:
     def __init__(self, pomdp):
         # init state
-        self.current_state = pomdp.get_state(False, {'object': self.get_obj(pomdp), 'person': ''}, [self.get_obj(pomdp), self.get_obj(pomdp), self.get_obj(pomdp)])
+        self.current_state = pomdp.get_state(False, {'object': self.get_obj(pomdp), 'title': 'u', 'gender': 'u'}, [self.get_obj(pomdp), self.get_obj(pomdp), self.get_obj(pomdp)])
         self.current_obs = None
         self.next_obs = None
         self.actionOut = None
@@ -93,9 +93,13 @@ class Agent:
     @staticmethod
     def print_ground_truth(person):
         print('--- Ground Truth ---')
-        print('Person name: ' + person.name)
-        print('Object name: ' + person.object)
-        print('Object properties: ' + person.prop_ground_truth)
+        print('Person:')
+        print('name: ' + person.name)
+        print('title: ' + person.title)
+        print('gender: ' + person.gender)
+        print('\nObject:')
+        print('name: ' + person.object)
+        print('properties: ' + person.prop_ground_truth)
 
     def print_device(self):
         if self.get_device():

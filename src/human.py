@@ -7,6 +7,8 @@ class Person(object):
     def __init__(self, data):
         self.object = data[0]
         self.name = data[1]
+        self.gender = 'unknown'
+        self.title = 'unknown'
         self.object_set = data[2].split(', ')
         self.object_index = self.get_index()
         self.obj_path = '../data/object_list.csv'
@@ -14,7 +16,21 @@ class Person(object):
         self.prop_list = Object(self.object).pred_list
         self.queried_attr = []
         self.predicates = []
+
+        self.get_info()
         self.get_predicates()
+
+    def get_info(self):
+        table = Table()
+        if self.name in table.professors:
+            self.title = 'professor'
+        elif self.name in table.students:
+            self.title = 'student'
+
+        if self.name in table.males:
+            self.gender = 'male'
+        elif self.name in table.females:
+            self.gender = 'female'
 
     def get_index(self):
         if self.object in self.object_set is True:

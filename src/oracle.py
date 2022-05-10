@@ -11,9 +11,11 @@ class Table:
         self.initial_facts_path = '../data/initial_facts.txt'
         self.training_data_path = '../data/training.csv'
         self.objects = []
-        self.known_professors = []
-        self.known_students = []
-        self.known_rooms = []
+        self.professors = []
+        self.students = []
+        self.females = []
+        self.males = []
+        self.rooms = []
         self.predicates = ['soft', 'green', 'full', 'empty', 'container', 'plastic', 'hard', 'blue', 'metal', 'toy']
         self.defaults = []
         self.training_data = []
@@ -48,9 +50,13 @@ class Table:
         p = re.compile(r'[(](.*?)[)]', re.S)
         for default in self.defaults:
             if default[0:3] == 'pro':
-                self.known_professors.append(re.findall(p, default)[0])
+                self.professors.append(re.findall(p, default)[0])
             elif default[0:3] == 'stu':
-                self.known_students.append(re.findall(p, default)[0])
+                self.students.append(re.findall(p, default)[0])
+            elif default[0:3] == 'fem':
+                self.females.append(re.findall(p, default)[0])
+            elif default[0:3] == 'mal':
+                self.males.append(re.findall(p, default)[0])
             # elif default[0:3] == 'pla':
             #     self.known_rooms.append(re.findall(p, default)[0])
 
